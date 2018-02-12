@@ -1,46 +1,31 @@
 # Semantic Segmentation
-### Introduction
-In this project, you'll label the pixels of a road in images using a Fully Convolutional Network (FCN).
+## Goal
 
-### Setup
-##### Frameworks and Packages
-Make sure you have the following is installed:
- - [Python 3](https://www.python.org/)
- - [TensorFlow](https://www.tensorflow.org/)
- - [NumPy](http://www.numpy.org/)
- - [SciPy](https://www.scipy.org/)
-##### Dataset
-Download the [Kitti Road dataset](http://www.cvlibs.net/datasets/kitti/eval_road.php) from [here](http://www.cvlibs.net/download.php?file=data_road.zip).  Extract the dataset in the `data` folder.  This will create the folder `data_road` with all the training a test images.
+The goal of this project is to implement a fully convolutional network in order to classify road segments from images. The baseis for this netowrk is the VGG-16 image classifier architecture, which can be downloaded as pretrained model. This pretrained model allows for a shorter computational time, when training the fully convolutional network. Similar to transfer learning, the learned weights can give a good start for this classification problem.
 
-### Start
-##### Implement
-Implement the code in the `main.py` module indicated by the "TODO" comments.
-The comments indicated with "OPTIONAL" tag are not required to complete.
-##### Run
-Run the following command to run the project:
-```
-python main.py
-```
-**Note** If running this in Jupyter Notebook system messages, such as those regarding test status, may appear in the terminal rather than the notebook.
+## Approach
 
-### Submission
-1. Ensure you've passed all the unit tests.
-2. Ensure you pass all points on [the rubric](https://review.udacity.com/#!/rubrics/989/view).
-3. Submit the following in a zip file.
- - `helper.py`
- - `main.py`
- - `project_tests.py`
- - Newest inference images from `runs` folder  (**all images from the most recent run**)
- 
- ### Tips
-- The link for the frozen `VGG16` model is hardcoded into `helper.py`.  The model can be found [here](https://s3-us-west-1.amazonaws.com/udacity-selfdrivingcar/vgg.zip)
-- The model is not vanilla `VGG16`, but a fully convolutional version, which already contains the 1x1 convolutions to replace the fully connected layers. Please see this [forum post](https://discussions.udacity.com/t/here-is-some-advice-and-clarifications-about-the-semantic-segmentation-project/403100/8?u=subodh.malgonde) for more information.  A summary of additional points, follow. 
-- The original FCN-8s was trained in stages. The authors later uploaded a version that was trained all at once to their GitHub repo.  The version in the GitHub repo has one important difference: The outputs of pooling layers 3 and 4 are scaled before they are fed into the 1x1 convolutions.  As a result, some students have found that the model learns much better with the scaling layers included. The model may not converge substantially faster, but may reach a higher IoU and accuracy. 
-- When adding l2-regularization, setting a regularizer in the arguments of the `tf.layers` is not enough. Regularization loss terms must be manually added to your loss function. otherwise regularization is not implemented.
- 
-### Using GitHub and Creating Effective READMEs
-If you are unfamiliar with GitHub , Udacity has a brief [GitHub tutorial](http://blog.udacity.com/2015/06/a-beginners-git-github-tutorial.html) to get you started. Udacity also provides a more detailed free [course on git and GitHub](https://www.udacity.com/course/how-to-use-git-and-github--ud775).
+In order to not start out in the blue, the proposed network architecture from the course was used. 
 
-To learn about REAMDE files and Markdown, Udacity provides a free [course on READMEs](https://www.udacity.com/courses/ud777), as well. 
+![Architecture](.pics/architecture.png)
 
-GitHub also provides a [tutorial](https://guides.github.com/features/mastering-markdown/) about creating Markdown files.
+### Regularization
+
+Regularization was introduced in order to keep the weights low. Regularization weights can be added to the loss function, this way, as soon as the weights of the individual layers get to high, they are taxed with a high cost and thus abandoned by the optimized. The overall cost computes as follows
+
+COST = Cross Entropy Loss + 0.004 * SUM(Regularization Weights)
+
+This cost is minimized using an Adam Optimizer with a learning rate of 0.0005 and a keep probability of 0.5.
+
+## Results
+
+The first training results reached a loss of 0.5, which proved to be nowhere close to an acceptable result. Increasing the number of epochs and decreasing the learning rate has proven to be a good approach to reach very low loss values. The final decision to take only 25 epochs was made mostly due to computational time, although the trend in loss values was still going down.
+
+### Example Pictures
+
+The following pictures show the result of the network.
+
+![Example 1](.pics/ex1.png)
+![Example 2](.pics/ex2.png)
+![Example 3](.pics/ex3.png)
+![Example 4](.pics/ex4.png)
